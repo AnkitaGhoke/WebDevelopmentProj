@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkMyCar - Maximize Parking Revenue</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            background-color: #000;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000; /* Ensure it's above other content */
+            transition: display 0.4s ease; /* Smooth transition for display change */
+        }
+
+        .header.hidden {
+            display: none; /* Hide the header when scrolled */
+        }
+
+        .header img {
+            width: 160px;
+        }
+
+        .header nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+
+        .header nav a:hover {
+            text-decoration: underline;
+        }
+
+        .header .right-corner {
+            display: flex;
+            gap: 10px; /* Add gap between the buttons */
+            margin-right: 30px; /* Shift the buttons slightly to the left */
+        }
+
+        .main {
+            margin-top: 70px; /* Adjust margin top to compensate for the fixed header */
+            position: relative;
+            color: white;
+        }
+
+        .main img {
+            width: 103%;
+            height: auto;
+            opacity: 0.4;
+        }
+
+        .main-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: black; /* Change the color to black */
+        }
+
+        .main-content h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+
+        .main-content p {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        .button {
+            background-color: #FF4500;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            font-size: 1.2em;
+            border-radius: 5px;
+            margin: 0 10px; /* Adjust the spacing between buttons */
+        }
+
+        .buttons {
+            margin-top: 20px; /* Adjust the top margin to separate from the text */
+        }
+
+        .buttons .button {
+            margin: 0 10px; /* Adjust the spacing between buttons */
+        }
+
+        .location {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .location h2 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .location a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background-color: #000;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            width: 100%;
+            bottom: 0;
+        }
+
+        .footer .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer .left-corner {
+            margin-left: 50px; /* Shift the logo slightly to the right */
+            margin-top: 50px;
+        }
+
+        .footer .left-corner img {
+            width: 150px; /* Adjust the width of the logo */
+        }
+
+        .footer .center-content {
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .footer .right-corner {
+            text-align: left;
+            margin-right: 20px;
+            /* Shift the right corner content slightly to the right */
+            width: 300px; /* Set a fixed width to ensure alignment */
+            margin-top: 50px;
+        }
+
+        .footer .right-corner p, .footer .right-corner h3 {
+            margin: 0;
+            padding: 2px 0;
+        }
+        
+
+    </style>
+</head>
+<body>
+    <header class="header">
+        <img src="static/ParkMyCar.png" alt="ParkMyCar Logo">
+        <nav>
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="#">About</a> 
+            <a href="{{ url_for('findparking') }}">Find Parking</a>
+            <a href="{{ url_for('EnlistProperty') }}">Enlist Property</a>
+            <a href="#">Customer Support</a> 
+        </nav>
+        <div class="right-corner">
+            <a href="{{ url_for('Register') }}" class="button">Register</a>
+            <a href="{{ url_for('Login') }}" class="button">Login</a>
+        </div>
+    </header>
+
+    <main class="main">
+        <img src="static/background.png" alt="Parking Lot">
+        <div class="main-content">
+            <h1>Find, Reserve and Enlist Parking with Ease</h1>
+            <p>Our mission is to revolutionize the way people find and reserve parking spaces all over India, making it convenient and stress-free. Whether you’re a driver in search of a nearby spot or a property owner with unused space, ParkMyCar brings you a seamless platform to meet your needs.</p>
+            <div class="buttons">
+                <a href="{{ url_for('findparking') }}" class="button">Find Parking</a>
+                <a href="{{ url_for('EnlistProperty') }}" class="button">Enlist Property</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="left-corner">
+                <img src="static/ParkMyCar.png" alt="ParkMyCar Logo">
+            </div>
+            <div class="right-corner">
+                <h3>Contact Us</h3>
+                <p>Email - support@parkmycar.com</p>
+                <p>Phone - 1800-123-456</p>
+                <p>Address - 4 Kalidas Road, Dehradun, 248001</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 ParkMyCar. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+        // Register the service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+            .then(function(registration) {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, function(error) {
+                console.log('ServiceWorker registration failed: ', error);
+            });
+        }
+    </script>
+
+    <script>
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            header.classList.toggle('hidden', window.scrollY > 0);
+        });
+    </script>
+</body>
+</html>

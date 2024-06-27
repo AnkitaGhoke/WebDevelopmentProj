@@ -9,6 +9,12 @@ packages = [{include = "repl_nix_webdevelopmentproj_1"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 flask = "^3.0.3"
+flask-cors = "^4.0.1"
+bcrypt = "^4.1.3"
+geopy = "^2.4.1"
+redis = "^5.0.6"
+googlemaps = "^4.10.0"
+django-geocode = "^0.1.6"
 
 
 [build-system]

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Parking - ParkMyCar</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .home-button {
+            background-color: #FF4500;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .home-button a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo {
+            font-weight: bold;
+            padding: 20px;
+            font-size: 1.5em;
+        }
+        .logo img {
+            width: 160px;
+            margin-left: 20px;
+            border-radius: 10px;
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 100px);
+        }
+        .left-side {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .right-side {
+            flex: 2;
+            position: relative;
+            padding: 20px;
+        }
+        
+
+
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .search-container > * {
+            margin-bottom: 10px;
+        }
+        .search-container label {
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+        .search-container input {
+            padding: 10px;
+            font-size: 1em;
+            flex-grow: 1;
+        }
+        .search-container button {
+            padding: 10px;
+            font-size: 1em;
+            margin-left: 10px;
+        }
+        .vehicle-type-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .vehicle-type-container label {
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+        .vehicle-type-container select {
+            padding: 10px;
+            font-size: 1em;
+        }
+        .time-duration-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            margin-left: 20px;
+        }
+        .time-duration-container label {
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+        .time-duration-container input[type="number"] {
+            padding: 10px;
+            font-size: 1em;
+            width: 80px;
+        }
+        .time-duration-container .time-control {
+            display: flex;
+            align-items: center;
+        }
+        .time-duration-container .time-control button {
+            padding: 5px 10px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #FF4500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-left: 5px;
+        }
+        .parking-info {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            cursor: pointer;
+        }
+        .parking-info:hover {
+            background-color: #f0f0f0;
+        }
+
+        .selected {
+            background-color: #ccc !important;
+        }
+        #book-button {
+            display: block;
+            margin: 20px auto;
+            padding: 15px 30px;
+            background-color: #FF4500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            text-align: center;
+        }
+        #book-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #total-amount {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+        }
+        .modal-content button {
+            margin-top: 20px;
+        }
+
+        #map {
+            width: 100%;
+            height: calc(100% - 100px);
+            margin-bottom: 20px;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYy2MLowsg4DUg4iakgE53D-yhFk78rhQ&libraries=places"></script>
+</head>
+<body>
+    <div class="home-button">
+        <a href="{{ url_for('home1') }}">Home</a>
+    </div>
+
+    <div class="logo">
+        <img src="static/ParkMyCar.png" alt="ParkMyCar Logo">
+    </div>
+
+    <div class="container">
+        <div class="left-side" id="parking-list">
+            <!-- Parking spaces will be listed here -->
+        </div>
+        <div class="right-side">
+            <div class="search-container">
+                <label for="address-input"><b>Find the Nearest Parking:</b></label>
+                <input type="text" id="address-input" placeholder="Enter address">
+                <button id="search-button">Search</button>
+            </div>
+            <div class="vehicle-type-container">
+                <label for="vehicle-type"><b>Vehicle Type:</b></label>
+                <select id="vehicle-type">
+                    <option value="2-wheeler">2 Wheeler</option>
+                    <option value="4-wheeler">4 Wheeler</option>
+                </select>
+                <div class="time-duration-container">
+                    <label for="time-duration"><b>Time Duration (hours):</b></label>
+                    <div class="time-control">
+                        <input type="number" id="time-duration" value="1" min="1" max="24">
+                    </div>
+                </div>
+            </div>
+            <div id="map"></div>
+            <div id="total-amount">Total Amount: 0 ₹</div>
+            <button id="book-button" disabled>Book Parking</button>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <p id="modal-message"></p>
+            <button id="modal-ok-button">OK</button>
+        </div>
+    </div>
+
+    <script>
+        let map;
+        let geocoder;
+        let marker;
+        let markers = [];
+        let selectedParking = null;
+        let loggedIn = true;  // Assume the user is logged in for this example
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 20.5937, lng: 78.9629 },
+                zoom: 5
+            });
+
+            marker = new google.maps.Marker({
+                map: map,
+                draggable: true
+            });
+
+            geocoder = new google.maps.Geocoder();
+            const addressInput = document.getElementById('address-input');
+            const searchButton = document.getElementById('search-button');
+            const bookButton = document.getElementById('book-button');
+            const vehicleTypeSelect = document.getElementById('vehicle-type');
+            const timeDurationInput = document.getElementById('time-duration');
+
+            const autocomplete = new google.maps.places.Autocomplete(addressInput);
+            autocomplete.bindTo('bounds', map);
+
+            searchButton.addEventListener('click', () => {
+                const address = addressInput.value;
+                geocodeAddress(address);
+            });
+
+            bookButton.addEventListener('click', () => {
+                if (!loggedIn) {
+                    alert('To Book, Please Login!');
+                    return;
+                }
+                if (selectedParking) {
+                    const userFirstName = "UserFirstName";  // Placeholder, replace with actual user data
+                    const userLastName = "UserLastName";  // Placeholder, replace with actual user data
+                    const bookingDate = new Date().toISOString().split('T')[0];
+                    const bookingTime = new Date().toISOString().split('T')[1].split('.')[0];
+                    const timeDuration = parseFloat(document.getElementById('time-duration').value);
+                    const bookingAmount = timeDuration * parseFloat(selectedParking.costPerHour);
+
+                    fetch('/book_parking', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            user_first_name: userFirstName,
+                            user_last_name: userLastName,
+                            provider_first_name: selectedParking.firstName,
+                            provider_last_name: selectedParking.lastName,
+                            provider_address: selectedParking.address,
+                            vehicle_type: selectedParking.vehicleType,
+                            booking_date: bookingDate,
+                            booking_time: bookingTime,
+                            time_duration: timeDuration,
+                            booking_amount: bookingAmount,
+                            availability: false
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showModal(`Parking booked at ${selectedParking.address}`);
+                            window.location.href = 'bookingconfirmation';
+                        } else {
+                            showModal('Failed to book parking.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            });
+
+            addressInput.addEventListener('keyup', (event) => {
+                if (event.key === "Enter") {
+                    searchButton.click();
+                }
+            });
+
+            autocomplete.addListener('place_changed', () => {
+                const place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    alert("No details available for input: '" + place.name + "'");
+                    return;
+                }
+                placeMarkerAndPanTo(place.geometry.location, map);
+                fetchParkingSpaces(place.geometry.location);
+            });
+
+            vehicleTypeSelect.addEventListener('change', () => {
+                fetchParkingSpaces(marker.getPosition());
+            });
+
+            timeDurationInput.addEventListener('input', () => {
+                updateTotalAmount();
+            });
+
+            // Removed the initial call to fetchParkingSpaces
+        }
+
+        function geocodeAddress(address) {
+            geocoder.geocode({ address: address }, (results, status) => {
+                if (status === 'OK') {
+                    placeMarkerAndPanTo(results[0].geometry.location, map);
+                    fetchParkingSpaces(results[0].geometry.location);
+                } else {
+                    alert('Geocode was not successful for the following reason: ' + status);
+                }
+            });
+        }
+
+        function placeMarkerAndPanTo(latLng, map) {
+            marker.setPosition(latLng);
+            map.panTo(latLng);
+        }
+
+        function fetchParkingSpaces(location) {
+            const addressInput = document.getElementById('address-input').value;
+            const vehicleType = document.getElementById('vehicle-type').value;
+            const timeDuration = document.getElementById('time-duration').value;
+
+            if (!addressInput) {
+                // Do not fetch parking spaces if address input is empty
+                return;
+            }
+
+            fetch(`/get_parking_spaces?address=${addressInput}&vehicle_type=${vehicleType}&time_duration=${timeDuration}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateParkingList(data);
+                    clearMarkers();
+                    addMarkers(data);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function updateParkingList(parkingSpots) {
+            const parkingList = document.getElementById('parking-list');
+            parkingList.innerHTML = '';
+
+            parkingSpots.forEach(spot => {
+                const parkingInfo = document.createElement('div');
+                parkingInfo.className = 'parking-info';
+                parkingInfo.innerHTML = `
+                    <b>Owner Name:</b> ${spot.firstName} ${spot.lastName}<br>
+                    <b>Address:</b> ${spot.address}<br>
+                    <b>Vehicle Type:</b> ${spot.vehicleType}<br>
+                    <b>Cost per Hour:</b> ${spot.costPerHour} ₹<br>
+                `;
+                parkingInfo.addEventListener('click', () => {
+                    selectParking(spot);
+                });
+                parkingList.appendChild(parkingInfo);
+            });
+        }
+
+        function addMarkers(parkingSpots) {
+            markers = [];
+
+            parkingSpots.forEach(spot => {
+                const marker = new google.maps.Marker({
+                    position: { lat: spot.latitude, lng: spot.longitude },
+                    map: map,
+                });
+
+                const contentString = `
+                    <div>
+                        <b>Cost per Hour:</b> ${spot.costPerHour} ₹
+                    </div>
+                `;
+
+                const infowindow = new google.maps.InfoWindow({
+                    content: contentString
+                });
+
+                marker.addListener('mouseover', () => {
+                    infowindow.open(map, marker);
+                    marker.setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
+                    marker.setIcon({
+                        url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                        scaledSize: new google.maps.Size(40, 40)
+                    });
+                });
+
+                marker.addListener('mouseout', () => {
+                    infowindow.close();
+                    marker.setZIndex(google.maps.Marker.MAX_ZINDEX - 1);
+                    marker.setIcon(null);
+                });
+
+                marker.addListener('click', () => {
+                    selectParking(spot);
+                });
+
+                markers.push(marker);
+            });
+        }
+
+        function clearMarkers() {
+            for (const marker of markers) {
+                marker.setMap(null);
+            }
+            markers = [];
+        }
+
+        function selectParking(parkingSpot) {
+            selectedParking = parkingSpot;
+            updateTotalAmount();
+            document.getElementById('book-button').disabled = false;
+        }
+
+        function updateTotalAmount() {
+            if (selectedParking) {
+                const timeDuration = parseFloat(document.getElementById('time-duration').value);
+                const totalAmount = timeDuration * parseFloat(selectedParking.costPerHour);
+                document.getElementById('total-amount').textContent = `Total Amount: ${totalAmount} ₹`;
+            }
+        }
+
+        function showModal(message, redirectUrl = null) {
+            const modal = document.getElementById('myModal');
+            const modalMessage = document.getElementById('modal-message');
+            const modalOkButton = document.getElementById('modal-ok-button');
+
+            modalMessage.textContent = message;
+            modal.style.display = "block";
+
+            modalOkButton.onclick = function() {
+                modal.style.display = "none";
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                }
+            }
+        }
+        window.onload = initMap;
+    </script>
+</body>
+</html>

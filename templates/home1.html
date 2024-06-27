@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to ParkMyCar</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            background-color: #000;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            top: 0;
+            position: fixed;
+            z-index: 1000;
+        }
+
+        .header img {
+            width: 160px;
+        }
+
+        .header nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+
+        .header nav a:hover {
+            text-decoration: underline;
+        }
+
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        .profile-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #FF4500;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 250px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+
+        .dropdown-content .user-info {
+            padding: 12px 16px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .dropdown-content .user-info .user-initial {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #FF4500;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            margin: 0 auto 10px;
+        }
+
+        .dropdown-content .user-info .user-welcome {
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: black;
+        }
+
+        .dropdown-content .user-info .user-email {
+            margin: 0;
+            font-size: 0.9em;
+            color: black;
+        }
+
+        .main {
+            margin-top: 70px; /* Adjust margin top to compensate for the fixed header */
+            position: relative;
+            color: white;
+        }
+
+        .main img {
+            width: 100%;
+            height: auto;
+            opacity: 0.4;
+        }
+
+        .main-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: black; /* Change the color to black */
+        }
+
+        .main-content h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+
+        .main-content p {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        .button {
+            background-color: #FF4500;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            font-size: 1.2em;
+            border-radius: 5px;
+            margin: 0 10px; /* Adjust the spacing between buttons */
+        }
+
+        .buttons {
+            margin-top: 20px; /* Adjust the top margin to separate from the text */
+        }
+
+        .buttons .button {
+            margin: 0 10px; /* Adjust the spacing between buttons */
+        }
+
+        .location {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .location h2 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .location a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .footer {
+            background-color: #000;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            width: 100%;
+            bottom: 0;
+        }
+
+        .footer .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer .left-corner {
+            margin-left: 50px; /* Shift the logo slightly to the right */
+            margin-top: 50px;
+        }
+
+        .footer .left-corner img {
+            width: 150px; /* Adjust the width of the logo */
+        }
+
+        .footer .center-content {
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .footer .right-corner {
+            text-align: left;
+            margin-right: 20px;
+            /* Shift the right corner content slightly to the right */
+            width: 300px; /* Set a fixed width to ensure alignment */
+            margin-top: 50px;
+        }
+
+        .footer .right-corner p, .footer .right-corner h3 {
+            margin: 0;
+            padding: 2px 0;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <img src="static/ParkMyCar.png" alt="ParkMyCar Logo">
+        <nav>
+            <a href="{{ url_for('home1') }}">Home</a>
+            <a href="#">About</a> 
+            <a href="{{ url_for('findparking') }}" >Find Parking</a>
+            <a href="{{ url_for('EnlistProperty') }}">Enlist Property</a>
+            <a href="#">Customer Support</a> 
+        </nav>
+        <div class="profile-dropdown">
+            <div class="profile-photo" id="profile-photo">{{ user_initial }}</div>
+            <div class="dropdown-content" id="dropdown-content">
+                <div class="user-info">
+                    <div class="user-initial">{{ user_initial }}</div>
+                    <p class="user-welcome">Welcome, {{ user.FirstName }}</p>
+                    <p class="user-email">{{ user.email }}</p>
+                </div>
+                <a href="{{ url_for('account_details') }}">Account Details</a>
+                <a href="#">My Bookings</a>
+                <a href="#">Customer Service</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <img src="static/background.png" alt="Parking Lot">
+        <div class="main-content">
+            <h1>Find, Reserve and Enlist Parking with Ease</h1>
+            <p>Our mission is to revolutionize the way people find and reserve parking spaces all over India, making it convenient and stress-free. Whether you’re a driver in search of a nearby spot or a property owner with unused space, ParkMyCar brings you a seamless platform to meet your needs.</p>
+            <div class="buttons">
+                <a href="{{ url_for('findparking') }}" class="button">Find Parking</a>
+                <a href="{{ url_for('EnlistProperty') }}" class="button">Enlist Property</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="left-corner">
+                <img src="static/ParkMyCar.png" alt="ParkMyCar Logo">
+            </div>
+            <div class="right-corner">
+                <h3>Contact Us</h3>
+                <p>Email - support@parkmycar.com</p>
+                <p>Phone - 1800-123-456</p>
+                <p>Address - 4 Kalidas Road, Dehradun, 248001</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 ParkMyCar. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const profilePhoto = document.getElementById('profile-photo');
+            const dropdownContent = document.getElementById('dropdown-content');
+
+            profilePhoto.addEventListener('click', function() {
+                dropdownContent.classList.toggle('show');
+            });
+
+            // Close the dropdown if the user clicks outside of it
+            window.onclick = function(event) {
+                if (!event.target.matches('.profile-photo')) {
+                    if (dropdownContent.classList.contains('show')) {
+                        dropdownContent.classList.remove('show');
+                    }
+                }
+            };
+        });
+
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            header.classList.toggle('hidden', window.scrollY > 0);
+        });
+
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Check if the user is logged in
+            const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
+            if (!isLoggedIn) {
+                // Redirect to login page if user is not logged in
+                window.location.href = "{{ url_for('Login') }}";
+            }
+        });
+
+            // Prevent back button from displaying the cached page
+        if (window.history && window.history.pushState) {
+            window.history.pushState('forward', null, document.URL);
+            window.addEventListener('popstate', function () {
+                window.location.href = "{{ url_for('Login') }}";
+            });
+        }
+    </script>
+</body>
+</html>
