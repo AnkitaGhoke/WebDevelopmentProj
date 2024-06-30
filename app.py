@@ -1,4 +1,4 @@
-from geopy.distance import geodesic
+
 import sqlite3
 import bcrypt
 from datetime import datetime
