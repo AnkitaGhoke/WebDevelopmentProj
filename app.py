@@ -236,10 +236,8 @@ def forgot_password():
 
 @app.route('/EnlistProperty', methods=['GET', 'POST'])
 def EnlistProperty():
-    is_logged_in = 'user_id' in session
+    is_logged_in = 'provider_id' in session
     return render_template('enlistproperty.html', my_secret=os.environ.get('GooglemapsAPI'), is_logged_in=is_logged_in)
-
-
 
 # Geocode function to get latitude and longitude
 def geocode_address(address):
@@ -292,7 +290,7 @@ def enlistproperty():
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (first_name, last_name, address, lat, lng, phone, email, vehicle_type, cost_per_hour))
 
-            
+
             conn.commit()
             conn.close()
 
@@ -301,7 +299,7 @@ def enlistproperty():
             print(f"Error: {e}")
             return jsonify({'success': False, 'message': 'Failed to enlist property!'}), 500
 
-        return redirect(url_for('home'))
+    return redirect(url_for('home1'))
 
 
 @app.route('/account_details')
